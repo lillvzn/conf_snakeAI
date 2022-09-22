@@ -19,17 +19,13 @@
 
 ### Training snake agent
 
-<video width="640" height="360" controls>
-  <source src="docs/agentTrainDemo.mp4" type="video/mp4">
-</video>
+https://user-images.githubusercontent.com/90083668/191706530-2344e53e-18b8-42cc-a2a4-12609ff445cd.mp4
 
 <br>
 
 ### Testing snake agent
 
-<video width="640" height="360" controls>
-  <source src="docs/agentTestDemo.mp4" type="video/mp4">
-</video>
+https://user-images.githubusercontent.com/90083668/191706424-1ae1a367-f081-426a-bb87-027ff4fadaca.mp4
 
 <br>
 
