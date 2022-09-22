@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+
+		<title>Snake AI</title>
+		
+		<link rel="stylesheet" href="./bootstrap/5.1.3/dist/css/bootstrap.min.css"></style>
+		<style>
+			html, body {
+				margin: 0;
+				height: 100%;
+			}
+			#mainCanvas {
+				width: 50%;
+				height: 100%;
+				display: table;
+				/* https://stackoverflow.com/questions/47344626/put-a-table-in-a-canvas-in-html */
+				position: fixed;
+				z-index: 0;
+
+				/* https://stackoverflow.com/questions/7768269/ipad-safari-disable-scrolling-and-bounce-effect */
+				/* https://web.archive.org/web/20151103001838/http://www.luster.io/blog/9-29-14-mobile-web-checklist.html */
+				/* Make things that shouldn't be selectable unselectable */
+				user-select: none;
+				-webkit-touch-callout: none;
+			}
+			#info {
+				position: absolute;
+				left: 1em;
+				top: 1em;
+				background: rgba(0,0,0,.8);
+				padding: .5em;
+				color: white;
+				font-family: monospace;
+				display: none;
+			}
+			/* MENU RELATED */
+			#mainMenu {
+				display: none;
+			}
+			#menuMobileButton {
+				position: absolute;
+				left: 10px;
+				top: 10px;
+				display: none;
+				z-index: 3;
+			}
+			#resumeButton {
+				display: none;
+			}
+
+			.menu {
+				display: table;
+				width: 100%;
+				/* https://stackoverflow.com/questions/47344626/put-a-table-in-a-canvas-in-html */
+				position: absolute;
+				z-index: 1;
+			}
+			/* https://stackoverflow.com/questions/558721/css-classes-subclasses */
+			.menu .columnSide { width: 40%; }
+			.menu .columnMain { width: 20%; }
+			.menu .columnMain .title { 
+				padding: 10px;
+				padding-left: 0;
+				padding-right: 0;
+
+				color: white;
+				font-family: Courier;
+				font-size: 12pt;
+				font-weight: bold;
+				text-align: center;
+			}
+			.menu .columnMain .menuButton {
+				width: 100%;
+				min-width: 200px;
+				min-height: 30px;
+
+				color: black;
+				font-family: Courier;
+				font-size: 12pt;
+				font-weight: bold;
+				text-align: center;
+			}
+
+			/* UI RELATED */
+			.gameui {
+				width: 49%;
+				/* https://stackoverflow.com/questions/47344626/put-a-table-in-a-canvas-in-html */
+				position: fixed;
+				z-index: 2;
+			}
+
+			/* https://www.w3schools.com/howto/howto_css_three_columns.asp */
+			/* Responsive layout - when the screen is less than 600px wide, 
+			 * make the three columns stack on top of each other instead of next to each other 
+			 */
+			@media screen and (max-width: 1100px) {
+				.menu .columnSide { width: 10%; }
+				.menu .columnMain { width: 80%; }
+				.menu .columnMain .title { font-size: 24pt; }
+				.menu .columnMain .menuButton { min-height: 60px; font-size: 24pt; }
+
+				/* see also:
+				 * https://github.com/nrsharip/iss-web/blob/e8ca66ade3933dfac4795ba7c44e067c26a079e2/moex/templates/moex/index.html#L27
+				 * https://github.com/nrsharip/iss-web/blob/e8ca66ade3933dfac4795ba7c44e067c26a079e2/moex/templates/moex/index.html#L86
+				 * https://github.com/nrsharip/iss-web/blob/e8ca66ade3933dfac4795ba7c44e067c26a079e2/moex/templates/moex/index.html#L238
+				 */
+				/* #menuMobileButton { display: block; } */
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container m-0"> <!-- for m-0 see: https://getbootstrap.com/docs/4.0/utilities/spacing/--> 
+			<div class="row">
+				<div class="col-7 text-center m-0 p-0">
+					<div class="container m-0 p-0">
+						<div class="row m-0 p-0">
+							<div class="col m-0 p-0">
+								<button id="trainButton" style="width:100%" type="button" class="btn btn-danger">TRAIN</button>
+							</div>
+							<div class="col m-0 p-0">
+								<button id="testButton" style="width:100%" type="button" class="btn btn-warning">TEST</button>
+							</div>
+							<div class="col m-0 p-0">
+								<button id="playButton" style="width:100%" type="button" class="btn btn-success">PLAY</button>
+							</div>
+						</div>
+					</div>
+					<div id="trainTab" style="display:none;" class="container m-0 p-0">
+						<div class="row m-0 p-0">
+							<div class="col m-0 p-0">
+								<button id="startStopTraining" type="button" class="btn btn-outline-primary btn-sm">Training: OFF</button>
+							</div>
+							<div class="col m-0 p-0">
+								<button id="startStopDrawing" type="button" class="btn btn-outline-primary btn-sm">Draw Models: OFF</button>
+							</div>
+							<div class="col m-0 p-0">
+								<button id="uploadPopulation" type="button" class="btn btn-outline-primary btn-sm">Upload Population...</button>
+								<input type="file" id="populationFileInput" accept="text/plain" hidden>
+
+								<br>
+								<span style="font-size: 8pt;">e.g. try population 
+									<a href="./data/population_20220712124030_4140.txt" download>#4140</a> or
+									<a href="./data/population_20220724212126_upd3_4520.txt" download>#4520</a>
+								</span> 
+							</div>
+						</div>
+
+						<div class="row m-0 p-0">
+							<div class="col m-0 p-0">
+								<canvas id="chart1" style="position: relative; width:40vw; height:20vh"></canvas>
+								<canvas id="chart3" style="position: relative; width:40vw; height:20vh"></canvas>
+								<canvas id="chart11" style="position: relative; width:40vw; height:60vh"></canvas>
+								<canvas id="chart10" style="position: relative; width:40vw; height:60vh"></canvas>
+								<canvas id="chart4" style="position: relative; width:40vw; height:20vh"></canvas>
+								<canvas id="chart5" style="position: relative; width:40vw; height:20vh"></canvas>
+								<canvas id="chart6" style="position: relative; width:40vw; height:20vh"></canvas>
+
+								<div class="container m-0 p-0">
+									<div class="row m-0 p-0">
+										<div class="col m-0 p-0">
+											<canvas id="chart2" style="position: relative; width:20vw; height:30vh"></canvas>
+										</div>
+										<div class="col m-0 p-0">
+											<canvas id="chart7" style="position: relative; width:20vw; height:30vh"></canvas>
+										</div>
+									</div>
+								</div>
+
+
+								<div class="container m-0 p-0">
+									<div class="row m-0 p-0">
+										<div class="col m-0 p-0">
+											<canvas id="chart8" style="position: relative; width:40vw; height:40vh"></canvas>
+										</div>
+									</div>
+									<div class="row m-0 p-0">
+										<div id="downloadBestParents1" class="col text-left m-0 p-0">
+											<span>Download:</span>
+										</div>			
+									</div>
+									<div class="row m-0 p-0">
+										<div class="col m-0 p-0">
+											<canvas id="chart9" style="position: relative; width:40vw; height:40vh"></canvas>
+										</div>
+									</div>
+									<div class="row m-0 p-0">
+										<div id="downloadBestParents2" class="col text-left m-0 p-0">
+											<span>Download:</span>
+										</div>
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+						<div class="row m-0 p-0">
+							<div class="col m-0 p-0">
+								Best Individual: <br>
+								<textarea name="bestIndividual" id="bestIndividual" cols="80" rows="8" style="font-size: 8pt; font-family: 'Courier New', Courier, monospace;"></textarea>
+							</div>
+						</div>
+
+						<div class="row m-0 p-0">
+							<div id="downloadPopulation" class="col text-left m-0 p-0">
+								<span>Download Population (per generation):</span>
+							</div>
+						</div>
+					</div>
+					
+					<div id="testTab" style="display:none;" class="container m-0 p-0">
+						<div class="row m-0 p-0">
+							<div class="col m-0 p-0">
+								Enter Chromosome to Test: <br>
+								<textarea name="testChromosome" id="testChromosome" cols="80" rows="8" style="font-size: 8pt; font-family: 'Courier New', Courier, monospace;"></textarea>
+								<br><span id="testChromosomeInfo"></span>
+							</div>
+						</div>
+					</div>
+
+					<div id="playTab" style="display:none;" class="container m-0 p-0">
+						<div class="row m-0 p-0">
+							<div class="col m-0 p-0"></div>
+							<div class="col m-0 p-0">
+								<p>(↑) Arrow Up - move up</p>
+								<p>(↓) Arrow Down - move down</p>
+								<p>(←) Arrow Left - move left</p>
+								<p>(→) Arrow Right - move right</p>
+							</div>
+							<div class="col m-0 p-0"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col m-0 p-0">
+					<div class="container gameui">
+						<div class="row">
+							<div id="generation" class="col text-center"></div>
+							<div id="chromosome" class="col text-center"></div>
+							<div id="score" class="col text-center"></div>
+							<div id="high_score" class="col text-center"></div>
+						</div>
+					</div>
+					<canvas id="mainCanvas"></canvas>
+				</div>
+			</div>
+		</div>
+		
+		<div id="info"></div>
+		<img id="menuMobileButton" src="assets/images/menu_shadedDark33.png">
+		<!-- https://stackoverflow.com/questions/47344626/put-a-table-in-a-canvas-in-html -->
+		<table id="mainMenu" class="menu">
+			<tr>
+				<td class="columnSide"></td>
+				<td class="columnMain">
+					<div class="title">
+						<a href="https://kenney.nl/assets/space-kit">Space Kit</a> (powered by <a href="https://threejs.org/">Three.js</a>)
+					</div>
+				</td>
+				<td class="columnSide"></td>
+			</tr>
+			<tr>
+				<td class="columnSide"></td>
+				<td class="columnMain">
+					<button id="resumeButton" class="menuButton">Resume</button>
+					<button id="startButton" class="menuButton" disabled>New Game</button>
+					<!-- https://stackoverflow.com/questions/14750078/style-disabled-button-with-css -->
+					<!-- <button class="menuButton" disabled>Multiplayer player</button>
+					<button class="menuButton" disabled>Settings</button>
+					<button class="menuButton" disabled>About</button>
+					<button class="menuButton" disabled>Quit</button> -->
+				</td>
+				<td class="columnSide"></td>
+			</tr>
+		</table>
+
+		<script src="./bootstrap/5.1.3/dist/js/bootstrap.min.js"></script>
+		<script src="./js/lib/ammo.js/7a574978fb28164a0a1510831eae52958edb4265/ammo.wasm.js"></script>
+		<script src="./js/lib/genetic-js/0.1.14/js/genetic-0.1.14.js"></script>
+		<!-- https://www.tensorflow.org/js/tutorials/setup -->
+		<!-- SWITCH TO MIN IN RELEASE -->
+		<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.18.0/dist/tf.js"></script>
+		<script src="./js/lib/jquery/3.6.0/dist/jquery.min.js"></script>
+		<script src="./js/lib/chart.js/3.8.0/dist/chart.min.js"></script>
+
+		<!-- Since Import maps are not yet supported by all browsers, it is necessary to add the polyfill es-module-shims.js. -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<!-- see https://unpkg.com/browse/three@0.141.0/ -->
+		<!-- see https://www.npmjs.com/package/three -->
+		<script type="importmap">
+		  {
+			"imports": {
+			  "three": "https://unpkg.com/three@0.142.0/build/three.module.js"
+			}
+		  }
+		</script>
+
+		<script type="module" src="./js/main.js"></script>
+		<script type="module" src="./js/playSnakeGame.js"></script>
+	</body>
+</html>
