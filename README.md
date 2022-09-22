@@ -134,12 +134,12 @@ Since the agent needed to learn the movements from scratch, the NN was trained b
 ## Results
 
 <figure>
-<img src="docs/best_game_scores_20220724212126.png?raw=true" width="70%">
+<img src="docs/best_game_scores_20220920212126.png?raw=true" width="70%">
 <figcaption align = "center">Game Scores w.r.t no. of generations trained</figcaption>
 
 <br>
 
-<img src="docs/scatter_20220724212126.gif?raw=true" width="70%">
+<img src="docs/scatter_20220920212126.gif?raw=true" width="70%">
 <figcaption align = "center">Best Fitness</figcaption>
 </figure>
 
@@ -184,8 +184,8 @@ Here is an example where the snake agent fails to make an efficient decision, in
   <figure>
   <table>
   <tr>
-    <td><img src="docs/failures_20220712124030_gen4152_1.gif?raw=true" width="100%"></td>
-    <td><img src="docs/failures_20220712124030_gen4152_2.gif?raw=true" width="100%"></td>
+    <td><img src="docs/failures_20220921124030_gen4152_1.gif?raw=true" width="100%"></td>
+    <td><img src="docs/failures_20220921124030_gen4152_2.gif?raw=true" width="100%"></td>
   </tr>
   </table>
   <figcaption align = "center">Scatterplot for gen#4140</figcaption>
