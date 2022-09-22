@@ -143,7 +143,7 @@ Since the agent needed to learn the movements from scratch, the NN was trained b
 <figcaption align = "center">Best Fitness</figcaption>
 </figure>
 
-(see [GAdata.txt](data/GAdata_20220724212126_upd3.txt)):
+(see [GAdata.txt](data/GAdata_20220922212126_upd3.txt)):
 
 ```
 Generation 4007 Best Game Score: 79
