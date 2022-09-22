@@ -58,7 +58,7 @@ Once the game was created, I needed to develop an algorithm through which the sn
 
 <br>
 
-<img src="docs/errorCase.png?raw=true" width="70%">
+<img src="docs/errorCase.png?raw=true" width="60%">
 
 <br>
 The head of the snake is indicated by the dark green block with eyes. The other green blocks are parts of the snake's body. The amount of available space if it moves in any direction in the next frame once it eats the fruit is 0, since the head will hit its own body no matter in which direction it moves, the game ends. The amount of available space if it goes left or right in the next frame is 3, since there are 3 open spaces enclosed around the snake's body in that direction. Finally, the amount of available space if it decides to go right in the next frame is 46, because this is the amount of spaces left in the grid that are not closed off by its body. But even with so many open spaces, the test case still fails.
