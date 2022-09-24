@@ -46,7 +46,7 @@ To create an autonomous snake agent to perform the necessary functions to maximi
 
 ## The nitty-gritty
 
-I coded the game for myself so I can understand the functions aspects of the game and make developing the intelligent agents easier. It was accomplished using modules from [three.js](https://threejs.org/). The game can be accessed [here](https://dummyside.xyz) and click **PLAY**
+I coded the game for myself so I can understand the functions aspects of the game and make developing the intelligent agents easier. It was accomplished using modules from [three.js](https://threejs.org/). The game can be accessed [here](https://snakecatch.blob.core.windows.net/) and click **PLAY** (manual)
 
 Once the game was created, I needed to develop an algorithm through which the snake can make intelligent decisions. I decided to perform the decisions based on the direction the snake turns. This was accomplished using neural network with two hidden layers, each with 10 nodes. Here are the inputs:
 
